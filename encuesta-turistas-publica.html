@@ -1,0 +1,491 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escapate · Encuesta Turistas</title>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,600;1,9..144,300;1,9..144,500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+:root{
+  --bg:#f2ece0;--ink:#1a1710;--cream:#faf6ee;
+  --verde:#2c4f12;--verde2:#3d6b1a;--verde-l:#e8f2de;
+  --ocre:#c0882a;--ocre-l:#fdf0d8;--azul:#1e3d6b;--azul-l:#e4ecf8;
+  --rojo-l:#fceaea;--muted:#8a8070;--border:rgba(26,23,16,0.10);
+}
+html{scroll-behavior:smooth}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+
+/* HERO */
+.hero{background:var(--verde);padding:48px 40px 60px;position:relative;overflow:hidden}
+.hero::before{content:'';position:absolute;top:-80px;right:-60px;width:320px;height:320px;border-radius:50%;background:rgba(192,136,42,0.15)}
+.hero-eye{font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;color:var(--ocre);margin-bottom:14px;position:relative;z-index:1}
+.hero h1{font-family:'Fraunces',serif;font-size:clamp(32px,6vw,56px);font-weight:300;color:#fff;line-height:1.05;margin-bottom:12px;position:relative;z-index:1}
+.hero h1 em{font-style:italic;color:var(--ocre)}
+.hero-sub{font-size:14px;color:rgba(255,255,255,0.72);line-height:1.7;max-width:480px;position:relative;z-index:1;margin-bottom:24px}
+.hero-meta{display:flex;gap:20px;position:relative;z-index:1}
+.hero-pill{background:rgba(255,255,255,0.1);border:1px solid rgba(255,255,255,0.2);padding:6px 14px;border-radius:100px;font-size:11px;color:rgba(255,255,255,0.8)}
+
+/* PROGRESS */
+.prog-bar-wrap{padding:20px 40px;background:var(--cream);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:50}
+.prog-track{height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:6px}
+.prog-fill{height:100%;background:var(--verde);border-radius:2px;transition:width 0.4s cubic-bezier(0.4,0,0.2,1)}
+.prog-info{display:flex;justify-content:space-between;font-size:11px;color:var(--muted)}
+
+/* BODY */
+.survey-body{max-width:680px;margin:0 auto;padding:40px 40px 80px}
+
+/* Q BLOCK */
+.q-block{display:none;animation:fadeUp 0.4s ease}
+.q-block.active{display:block}
+@keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+
+.q-chip{display:inline-block;font-size:10px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;padding:3px 10px;border-radius:100px;margin-bottom:12px}
+.q-num{font-size:11px;font-weight:600;letter-spacing:2px;text-transform:uppercase;color:var(--ocre);margin-bottom:8px}
+.q-text{font-family:'Fraunces',serif;font-size:clamp(18px,3vw,24px);font-weight:300;line-height:1.3;color:var(--ink);margin-bottom:6px}
+.q-hint{font-size:13px;color:var(--muted);margin-bottom:24px;line-height:1.5}
+
+/* OPTIONS */
+.opts{display:flex;flex-direction:column;gap:9px}
+.opts.g2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.opts.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px}
+
+.opt{
+  padding:13px 16px;border:1.5px solid var(--border);border-radius:10px;
+  cursor:pointer;background:var(--cream);font-size:13.5px;color:var(--ink);
+  transition:all 0.2s;display:flex;align-items:center;gap:10px;
+  font-family:'DM Sans',sans-serif;text-align:left;width:100%;
+}
+.opt:hover{border-color:var(--verde2);background:#f0f8e6}
+.opt.sel{border-color:var(--verde);background:var(--verde-l);font-weight:500}
+.opt.sel .chk{background:var(--verde);color:#fff;border-color:var(--verde)}
+.chk{width:20px;height:20px;border-radius:50%;border:1.5px solid var(--border);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:10px;transition:all 0.2s;margin-left:auto}
+.opt-em{font-size:17px;flex-shrink:0}
+
+/* SCALE */
+.scale-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--muted);margin-bottom:8px}
+.scale-row{display:flex;gap:7px}
+.sc-btn{flex:1;height:42px;border:1.5px solid var(--border);border-radius:8px;background:var(--cream);cursor:pointer;font-size:14px;font-weight:500;color:var(--muted);transition:all 0.2s;font-family:'DM Sans',sans-serif}
+.sc-btn:hover{border-color:var(--verde2)}
+.sc-btn.sel{background:var(--verde);color:#fff;border-color:var(--verde);font-weight:600}
+
+/* TEXTAREA */
+.q-ta{width:100%;min-height:90px;padding:13px 15px;border:1.5px solid var(--border);border-radius:10px;background:var(--cream);font-size:13.5px;font-family:'DM Sans',sans-serif;color:var(--ink);resize:vertical;outline:none;transition:border-color 0.2s}
+.q-ta:focus{border-color:var(--verde)}
+
+/* NAV */
+.q-nav{display:flex;justify-content:space-between;align-items:center;margin-top:28px;padding-top:20px;border-top:1px solid var(--border)}
+.btn-p,.btn-n{padding:11px 24px;border-radius:100px;font-size:13px;font-weight:500;cursor:pointer;transition:all 0.2s;border:none;font-family:'DM Sans',sans-serif}
+.btn-p{background:var(--cream);border:1.5px solid var(--border);color:var(--muted)}
+.btn-p:hover{border-color:var(--ink);color:var(--ink)}
+.btn-n{background:var(--verde);color:#fff}
+.btn-n:hover{opacity:0.88}
+
+/* THANKS */
+.thanks{display:none;text-align:center;padding:60px 40px}
+.thanks.show{display:block}
+.thanks-icon{font-size:56px;margin-bottom:20px}
+.thanks h2{font-family:'Fraunces',serif;font-size:36px;font-weight:300;margin-bottom:12px}
+.thanks p{font-size:15px;color:var(--muted);line-height:1.7;max-width:440px;margin:0 auto 32px}
+.thanks-box{background:var(--verde);border-radius:12px;padding:20px 24px;color:rgba(255,255,255,0.9);font-family:'Fraunces',serif;font-size:18px;font-style:italic;line-height:1.5;max-width:500px;margin:0 auto}
+
+.saving{text-align:center;padding:16px;font-size:13px;color:var(--muted);display:none}
+.saving.show{display:block}
+
+@media(max-width:600px){
+  .hero,.survey-body,.prog-bar-wrap{padding-left:20px;padding-right:20px}
+  .opts.g2,.opts.g3{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="hero">
+  <div class="hero-eye">Escapate · Investigación de mercado</div>
+  <h1>Cuéntanos cómo<br><em>vives el campo</em></h1>
+  <p class="hero-sub">Estamos construyendo una plataforma de turismo rural diferente. Antes de lanzarla, queremos escucharte. La encuesta dura menos de 7 minutos y cada respuesta importa.</p>
+  <div class="hero-meta">
+    <span class="hero-pill">⏱ ~7 minutos</span>
+    <span class="hero-pill">🔒 Anónimo</span>
+    <span class="hero-pill">📋 18 preguntas</span>
+  </div>
+</div>
+
+<div class="prog-bar-wrap">
+  <div class="prog-track"><div class="prog-fill" id="pf" style="width:0%"></div></div>
+  <div class="prog-info"><span id="qnum">Pregunta 1 de 18</span><span id="qpct">0%</span></div>
+</div>
+
+<div class="survey-body">
+
+  <!-- Q1 -->
+  <div class="q-block active" id="q1">
+    <div class="q-num">01 · Perfil</div>
+    <div class="q-chip" style="background:var(--verde-l);color:var(--verde)">Datos personales</div>
+    <div class="q-text">¿En qué franja de edad te encuentras?</div>
+    <div class="opts g2">
+      <button class="opt" onclick="pick(this,'q1')"><span class="opt-em">🌱</span>18 – 27 años<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q1')"><span class="opt-em">🚀</span>28 – 40 años<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q1')"><span class="opt-em">🌳</span>41 – 55 años<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q1')"><span class="opt-em">🌾</span>56 – 70 años<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q1')"><span class="opt-em">🏔</span>Más de 70 años<span class="chk"></span></button>
+    </div>
+    <div class="q-nav"><span></span><button class="btn-n" onclick="go(2)">Siguiente →</button></div>
+  </div>
+
+  <!-- Q2 -->
+  <div class="q-block" id="q2">
+    <div class="q-num">02 · Perfil</div>
+    <div class="q-text">¿Con quién sueles hacer escapadas rurales?</div>
+    <div class="q-hint">Elige la opción más frecuente.</div>
+    <div class="opts">
+      <button class="opt" onclick="pick(this,'q2')"><span class="opt-em">🧘</span>Solo/a<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q2')"><span class="opt-em">🍷</span>En pareja<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q2')"><span class="opt-em">👨‍👩‍👧</span>Con familia con hijos<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q2')"><span class="opt-em">🎉</span>Con amigos (3–6 personas)<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q2')"><span class="opt-em">🏟</span>Grupo grande (+6 personas)<span class="chk"></span></button>
+    </div>
+    <div class="q-nav"><button class="btn-p" onclick="go(1)">← Anterior</button><button class="btn-n" onclick="go(3)">Siguiente →</button></div>
+  </div>
+
+  <!-- Q3 -->
+  <div class="q-block" id="q3">
+    <div class="q-num">03 · Perfil</div>
+    <div class="q-text">¿Cuál es tu rango de ingresos mensuales netos?</div>
+    <div class="opts g2">
+      <button class="opt" onclick="pick(this,'q3')">Menos de 1.500 €/mes<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q3')">1.500 – 2.500 €/mes<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q3')">2.500 – 4.000 €/mes<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q3')">Más de 4.000 €/mes<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q3')">Prefiero no decirlo<span class="chk"></span></button>
+    </div>
+    <div class="q-nav"><button class="btn-p" onclick="go(2)">← Anterior</button><button class="btn-n" onclick="go(4)">Siguiente →</button></div>
+  </div>
+
+  <!-- Q4 -->
+  <div class="q-block" id="q4">
+    <div class="q-num">04 · Hábitos</div>
+    <div class="q-chip" style="background:var(--ocre-l);color:var(--ocre)">Hábitos de viaje</div>
+    <div class="q-text">¿Cuántas escapadas rurales haces al año aproximadamente?</div>
+    <div class="opts g3">
+      <button class="opt" onclick="pick(this,'q4')">Ninguna<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q4')">1 – 2<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q4')">3 – 4<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q4')">5 – 6<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q4')">+7<span class="chk"></span></button>
+    </div>
+    <div class="q-nav"><button class="btn-p" onclick="go(3)">← Anterior</button><button class="btn-n" onclick="go(5)">Siguiente →</button></div>
+  </div>
+
+  <!-- Q5 -->
+  <div class="q-block" id="q5">
+    <div class="q-num">05 · Hábitos</div>
+    <div class="q-text">¿Cuánto sueles gastar por persona y noche en alojamiento rural?</div>
+    <div class="opts g2">
+      <button class="opt" onclick="pick(this,'q5')">Menos de 40 €/pers<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q5')">40 – 80 €/pers<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q5')">80 – 130 €/pers<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q5')">130 – 200 €/pers<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q5')">Más de 200 €/pers<span class="chk"></span></button>
+    </div>
+    <div class="q-nav"><button class="btn-p" onclick="go(4)">← Anterior</button><button class="btn-n" onclick="go(6)">Siguiente →</button></div>
+  </div>
+
+  <!-- Q6 MULTI -->
+  <div class="q-block" id="q6">
+    <div class="q-num">06 · Hábitos</div>
+    <div class="q-text">¿Qué plataformas usas para reservar alojamiento rural?</div>
+    <div class="q-hint">Puedes marcar varias.</div>
+    <div class="opts g2">
+      <button class="opt" onclick="multi(this,'q6')"><span class="opt-em">🏠</span>Airbnb<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q6')"><span class="opt-em">📋</span>Booking.com<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q6')"><span class="opt-em">🌿</span>Rusticae<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q6')"><span class="opt-em">🏡</span>Toprural / Ruralia<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q6')"><span class="opt-em">🔍</span>Google directo<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q6')"><span class="opt-em">👥</span>Recomendación amigos<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q6')"><span class="opt-em">📱</span>Instagram / TikTok<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q6')"><span class="opt-em">🏢</span>Portal empresa<span class="chk"></span></button>
+    </div>
+    <div class="q-nav"><button class="btn-p" onclick="go(5)">← Anterior</button><button class="btn-n" onclick="go(7)">Siguiente →</button></div>
+  </div>
+
+  <!-- Q7 DOLOR -->
+  <div class="q-block" id="q7">
+    <div class="q-num">07 · Frustraciones</div>
+    <div class="q-chip" style="background:var(--rojo-l);color:#9e2a2a">Puntos de dolor</div>
+    <div class="q-text">¿Qué te frustra más al buscar casa rural en las plataformas actuales?</div>
+    <div class="q-hint">Marca hasta 3 opciones.</div>
+    <div class="opts">
+      <button class="opt" onclick="multi(this,'q7')"><span class="opt-em">🖼</span>Las fotos no se corresponden con la realidad<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q7')"><span class="opt-em">🔍</span>No puedo filtrar por lo que realmente busco<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q7')"><span class="opt-em">🗺</span>No sé qué hacer en la zona ni qué hay cerca<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q7')"><span class="opt-em">💬</span>Las valoraciones son genéricas o poco fiables<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q7')"><span class="opt-em">💰</span>El precio final con tasas es muy diferente al inicial<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q7')"><span class="opt-em">😑</span>Hay demasiadas opciones y es abrumador elegir<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q7')"><span class="opt-em">📞</span>Es difícil contactar con el propietario<span class="chk"></span></button>
+    </div>
+    <div class="q-nav"><button class="btn-p" onclick="go(6)">← Anterior</button><button class="btn-n" onclick="go(8)">Siguiente →</button></div>
+  </div>
+
+  <!-- Q8 ESTADO ÁNIMO -->
+  <div class="q-block" id="q8">
+    <div class="q-num">08 · Concepto clave</div>
+    <div class="q-chip" style="background:var(--verde-l);color:var(--verde)">Validación del concepto</div>
+    <div class="q-text">Si pudieras buscar escapada por cómo te sientes ahora mismo, ¿qué elegirías?</div>
+    <div class="opts g2">
+      <button class="opt" onclick="pick(this,'q8')"><span class="opt-em">🧘</span>Necesito descansar de verdad<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q8')"><span class="opt-em">🏕</span>Quiero aventura y actividad<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q8')"><span class="opt-em">🍷</span>Escapada romántica<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q8')"><span class="opt-em">🎉</span>Plan con amigos<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q8')"><span class="opt-em">💻</span>Teletrabajar en la naturaleza<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q8')"><span class="opt-em">✨</span>Lujo rural / capricharme<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q8')"><span class="opt-em">👨‍👩‍👧</span>Plan familiar con niños<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q8')"><span class="opt-em">🌒</span>Desconectar del todo<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q8')"><span class="opt-em">🍽</span>Gastronomía y cultura local<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q8')"><span class="opt-em">🌿</span>Turismo sostenible / consciente<span class="chk"></span></button>
+    </div>
+    <div class="q-nav"><button class="btn-p" onclick="go(7)">← Anterior</button><button class="btn-n" onclick="go(9)">Siguiente →</button></div>
+  </div>
+
+  <!-- Q9 ESCALA CONCEPTO -->
+  <div class="q-block" id="q9">
+    <div class="q-num">09 · Concepto</div>
+    <div class="q-text">¿Con qué probabilidad usarías una plataforma que te muestra casas según tu estado de ánimo?</div>
+    <div class="scale-labels"><span>Muy improbable</span><span>Muy probable</span></div>
+    <div class="scale-row" id="sc9">
+      <button class="sc-btn" onclick="scale(this,'sc9','q9')">1</button>
+      <button class="sc-btn" onclick="scale(this,'sc9','q9')">2</button>
+      <button class="sc-btn" onclick="scale(this,'sc9','q9')">3</button>
+      <button class="sc-btn" onclick="scale(this,'sc9','q9')">4</button>
+      <button class="sc-btn" onclick="scale(this,'sc9','q9')">5</button>
+      <button class="sc-btn" onclick="scale(this,'sc9','q9')">6</button>
+      <button class="sc-btn" onclick="scale(this,'sc9','q9')">7</button>
+    </div>
+    <div class="q-nav"><button class="btn-p" onclick="go(8)">← Anterior</button><button class="btn-n" onclick="go(10)">Siguiente →</button></div>
+  </div>
+
+  <!-- Q10 ACTIVIDADES -->
+  <div class="q-block" id="q10">
+    <div class="q-num">10 · Actividades</div>
+    <div class="q-chip" style="background:var(--azul-l);color:var(--azul)">Experiencias</div>
+    <div class="q-text">¿Qué actividades te gustaría poder reservar junto con el alojamiento?</div>
+    <div class="q-hint">Marca todas las que te interesen.</div>
+    <div class="opts g2">
+      <button class="opt" onclick="multi(this,'q10')"><span class="opt-em">🥾</span>Senderismo guiado<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q10')"><span class="opt-em">🍷</span>Cata de vinos / bodega<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q10')"><span class="opt-em">🧘</span>Yoga o meditación<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q10')"><span class="opt-em">🛶</span>Kayak o piragua<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q10')"><span class="opt-em">🍽</span>Cena gastronómica local<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q10')"><span class="opt-em">🌟</span>Observación astronómica<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q10')"><span class="opt-em">🐴</span>Rutas a caballo<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q10')"><span class="opt-em">🧀</span>Visita a productor local<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q10')"><span class="opt-em">🎨</span>Taller artesanía<span class="chk"></span></button>
+      <button class="opt" onclick="multi(this,'q10')"><span class="opt-em">🚴</span>Ciclismo o BTT<span class="chk"></span></button>
+    </div>
+    <div class="q-nav"><button class="btn-p" onclick="go(9)">← Anterior</button><button class="btn-n" onclick="go(11)">Siguiente →</button></div>
+  </div>
+
+  <!-- Q11 GASTO ACTIVIDADES -->
+  <div class="q-block" id="q11">
+    <div class="q-num">11 · Actividades</div>
+    <div class="q-text">¿Cuánto gastarías en actividades adicionales por persona y escapada?</div>
+    <div class="opts">
+      <button class="opt" onclick="pick(this,'q11')">No me interesan las actividades extra<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q11')">Menos de 30 € por persona<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q11')">30 – 60 € por persona<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q11')">60 – 100 € por persona<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q11')">Más de 100 € por persona<span class="chk"></span></button>
+    </div>
+    <div class="q-nav"><button class="btn-p" onclick="go(10)">← Anterior</button><button class="btn-n" onclick="go(12)">Siguiente →</button></div>
+  </div>
+
+  <!-- Q12 MARKETPLACE -->
+  <div class="q-block" id="q12">
+    <div class="q-num">12 · Marketplace</div>
+    <div class="q-text">¿Comprarías productos rurales locales (vino, queso, miel…) para recibirlos en Madrid?</div>
+    <div class="opts">
+      <button class="opt" onclick="pick(this,'q12')"><span class="opt-em">✅</span>Sí, lo usaría con frecuencia<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q12')"><span class="opt-em">🤔</span>Sí, dependiendo de productos y precios<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q12')"><span class="opt-em">😐</span>Prefiero comprarlo cuando estoy allí<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q12')"><span class="opt-em">❌</span>No me interesa<span class="chk"></span></button>
+    </div>
+    <div class="q-nav"><button class="btn-p" onclick="go(11)">← Anterior</button><button class="btn-n" onclick="go(13)">Siguiente →</button></div>
+  </div>
+
+  <!-- Q13 WORKCATION -->
+  <div class="q-block" id="q13">
+    <div class="q-num">13 · Workcation</div>
+    <div class="q-text">¿Has teletrabajado alguna vez desde un entorno rural o te lo has planteado?</div>
+    <div class="opts">
+      <button class="opt" onclick="pick(this,'q13')"><span class="opt-em">💻</span>Sí, lo hago habitualmente<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q13')"><span class="opt-em">🤔</span>Lo he hecho y me gustaría repetir<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q13')"><span class="opt-em">💡</span>Me lo he planteado pero nunca lo he hecho<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q13')"><span class="opt-em">❌</span>No me lo planteo<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q13')"><span class="opt-em">🏢</span>Mi trabajo no permite teletrabajar<span class="chk"></span></button>
+    </div>
+    <div class="q-nav"><button class="btn-p" onclick="go(12)">← Anterior</button><button class="btn-n" onclick="go(14)">Siguiente →</button></div>
+  </div>
+
+  <!-- Q14 SOSTENIBILIDAD -->
+  <div class="q-block" id="q14">
+    <div class="q-num">14 · Valores</div>
+    <div class="q-text">¿Cuánto pesa la sostenibilidad en tu decisión de elegir alojamiento?</div>
+    <div class="scale-labels"><span>Nada relevante</span><span>Factor decisivo</span></div>
+    <div class="scale-row" id="sc14">
+      <button class="sc-btn" onclick="scale(this,'sc14','q14')">1</button>
+      <button class="sc-btn" onclick="scale(this,'sc14','q14')">2</button>
+      <button class="sc-btn" onclick="scale(this,'sc14','q14')">3</button>
+      <button class="sc-btn" onclick="scale(this,'sc14','q14')">4</button>
+      <button class="sc-btn" onclick="scale(this,'sc14','q14')">5</button>
+      <button class="sc-btn" onclick="scale(this,'sc14','q14')">6</button>
+      <button class="sc-btn" onclick="scale(this,'sc14','q14')">7</button>
+    </div>
+    <div class="q-nav"><button class="btn-p" onclick="go(13)">← Anterior</button><button class="btn-n" onclick="go(15)">Siguiente →</button></div>
+  </div>
+
+  <!-- Q15 ANTELACIÓN -->
+  <div class="q-block" id="q15">
+    <div class="q-num">15 · Comportamiento</div>
+    <div class="q-text">¿Con cuánta antelación sueles reservar una escapada rural?</div>
+    <div class="opts g2">
+      <button class="opt" onclick="pick(this,'q15')">El mismo día o semana<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q15')">1 – 2 semanas antes<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q15')">3 – 4 semanas antes<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q15')">1 – 2 meses antes<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q15')">Más de 2 meses antes<span class="chk"></span></button>
+    </div>
+    <div class="q-nav"><button class="btn-p" onclick="go(14)">← Anterior</button><button class="btn-n" onclick="go(16)">Siguiente →</button></div>
+  </div>
+
+  <!-- Q16 DISPOSITIVO -->
+  <div class="q-block" id="q16">
+    <div class="q-num">16 · Digital</div>
+    <div class="q-text">¿Desde qué dispositivo buscas y reservas habitualmente?</div>
+    <div class="opts">
+      <button class="opt" onclick="pick(this,'q16')"><span class="opt-em">📱</span>Móvil principalmente<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q16')"><span class="opt-em">💻</span>Ordenador principalmente<span class="chk"></span></button>
+      <button class="opt" onclick="pick(this,'q16')"><span class="opt-em">🔀</span>Busco en móvil, reservo en ordenador<span class="chk"></span></button>
+    </div>
+    <div class="q-nav"><button class="btn-p" onclick="go(15)">← Anterior</button><button class="btn-n" onclick="go(17)">Siguiente →</button></div>
+  </div>
+
+  <!-- Q17 NPS -->
+  <div class="q-block" id="q17">
+    <div class="q-num">17 · Intención</div>
+    <div class="q-text">¿Qué probabilidad hay de que recomendaras Escapate a un amigo una vez lanzada?</div>
+    <div class="q-hint">0 = nunca · 10 = con certeza</div>
+    <div class="scale-row" id="sc17" style="flex-wrap:wrap;gap:6px">
+      <button class="sc-btn" onclick="scale(this,'sc17','q17')" style="min-width:44px;flex:none">0</button>
+      <button class="sc-btn" onclick="scale(this,'sc17','q17')" style="min-width:44px;flex:none">1</button>
+      <button class="sc-btn" onclick="scale(this,'sc17','q17')" style="min-width:44px;flex:none">2</button>
+      <button class="sc-btn" onclick="scale(this,'sc17','q17')" style="min-width:44px;flex:none">3</button>
+      <button class="sc-btn" onclick="scale(this,'sc17','q17')" style="min-width:44px;flex:none">4</button>
+      <button class="sc-btn" onclick="scale(this,'sc17','q17')" style="min-width:44px;flex:none">5</button>
+      <button class="sc-btn" onclick="scale(this,'sc17','q17')" style="min-width:44px;flex:none">6</button>
+      <button class="sc-btn" onclick="scale(this,'sc17','q17')" style="min-width:44px;flex:none">7</button>
+      <button class="sc-btn" onclick="scale(this,'sc17','q17')" style="min-width:44px;flex:none">8</button>
+      <button class="sc-btn" onclick="scale(this,'sc17','q17')" style="min-width:44px;flex:none">9</button>
+      <button class="sc-btn" onclick="scale(this,'sc17','q17')" style="min-width:44px;flex:none">10</button>
+    </div>
+    <div class="q-nav"><button class="btn-p" onclick="go(16)">← Anterior</button><button class="btn-n" onclick="go(18)">Siguiente →</button></div>
+  </div>
+
+  <!-- Q18 ABIERTA -->
+  <div class="q-block" id="q18">
+    <div class="q-num">18 · Última pregunta</div>
+    <div class="q-chip" style="background:var(--verde-l);color:var(--verde)">Pregunta libre</div>
+    <div class="q-text">¿Qué no te ofrece ninguna plataforma hoy y realmente querrías encontrar?</div>
+    <div class="q-hint">Respuesta libre. Todo lo que escribas es valioso — no hay respuesta incorrecta.</div>
+    <textarea class="q-ta" id="ta18" placeholder="Escribe aquí..."></textarea>
+    <div class="q-nav"><button class="btn-p" onclick="go(17)">← Anterior</button><button class="btn-n" onclick="submit()">Enviar ✓</button></div>
+  </div>
+
+  <div class="saving" id="saving">⏳ Guardando tus respuestas…</div>
+
+  <!-- GRACIAS -->
+  <div class="thanks" id="thanks">
+    <div class="thanks-icon">🌿</div>
+    <h2>¡Muchas gracias!</h2>
+    <p>Tu opinión nos ayuda a construir una plataforma que realmente merezca la pena para los viajeros y para los pueblos que visitan.</p>
+    <div class="thanks-box">"Queremos que la gente aprecie y viva el campo como es, no solo que vaya a pasear y comprar un imán."</div>
+  </div>
+
+</div><!-- /survey-body -->
+
+<script>
+const TOTAL = 18;
+let cur = 1;
+const ans = {};
+
+function go(n) {
+  document.getElementById('q' + cur).classList.remove('active');
+  cur = n;
+  const el = document.getElementById('q' + cur);
+  if (el) { el.classList.add('active'); }
+  const pct = Math.round((cur - 1) / TOTAL * 100);
+  document.getElementById('pf').style.width = pct + '%';
+  document.getElementById('qnum').textContent = `Pregunta ${cur} de ${TOTAL}`;
+  document.getElementById('qpct').textContent = pct + '%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function pick(el, qid) {
+  el.closest('.opts').querySelectorAll('.opt').forEach(o => {
+    o.classList.remove('sel');
+    o.querySelector('.chk').textContent = '';
+  });
+  el.classList.add('sel');
+  el.querySelector('.chk').textContent = '✓';
+  // get text without emoji
+  const txt = el.textContent.replace(/[^\w\s\u00C0-\u024F\-–·\/€%,\.]/gu, '').trim();
+  ans[qid] = txt;
+}
+
+function multi(el, qid) {
+  el.classList.toggle('sel');
+  el.querySelector('.chk').textContent = el.classList.contains('sel') ? '✓' : '';
+  const sel = [];
+  el.closest('.opts').querySelectorAll('.opt.sel').forEach(o => {
+    const txt = o.textContent.replace(/[^\w\s\u00C0-\u024F\-–·\/€%,\.]/gu, '').trim();
+    sel.push(txt);
+  });
+  ans[qid] = sel;
+}
+
+function scale(el, groupId, qid) {
+  document.querySelectorAll(`#${groupId} .sc-btn`).forEach(b => b.classList.remove('sel'));
+  el.classList.add('sel');
+  ans[qid] = el.textContent.trim();
+}
+
+async function submit() {
+  ans['q18'] = document.getElementById('ta18').value.trim();
+  ans['ts'] = new Date().toISOString();
+
+  document.getElementById('q18').classList.remove('active');
+  document.getElementById('saving').classList.add('show');
+
+  try {
+    // Load existing data
+    let existing = [];
+    try {
+      const r = await window.storage.get('escapate:survey:turistas', true);
+      if (r) existing = JSON.parse(r.value);
+    } catch(e) { existing = []; }
+
+    existing.push(ans);
+    await window.storage.set('escapate:survey:turistas', JSON.stringify(existing), true);
+  } catch(e) {
+    console.log('Storage error (demo mode):', e);
+  }
+
+  document.getElementById('saving').classList.remove('show');
+  document.getElementById('thanks').classList.add('show');
+  document.getElementById('pf').style.width = '100%';
+  document.getElementById('qnum').textContent = 'Completada';
+  document.getElementById('qpct').textContent = '100%';
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+</script>
+</body>
+</html>
